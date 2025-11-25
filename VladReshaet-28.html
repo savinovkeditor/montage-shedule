@@ -1,0 +1,2810 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>График постпродакшена</title>
+  <style>
+    :root {
+      --bg-page: #f5f7fb;
+      --bg-card: #ffffff;
+      --border-subtle: #e5e7eb;
+      --border-strong: #cbd5e1;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --text-main: #0f172a;
+      --text-muted: #6b7280;
+      --danger: #dc2626;
+      --sunday-bg: #fef2f2;
+      --holiday-bg: #ecfeff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: var(--bg-page);
+      color: var(--text-main);
+    }
+
+    body.fullscreen-active {
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(260px, 420px) minmax(0, 1fr);
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      padding: 14px 16px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    #controls { margin-bottom: 10px; }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      margin-bottom: 10px;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    input[type="number"],
+    input[type="date"],
+    input[type="text"],
+    select {
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      font-size: 13px;
+      background: #f9fafb;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.35);
+      background: #ffffff;
+    }
+
+    button {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      background: var(--accent);
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 10px 18px rgba(37, 99, 235, 0.25);
+      transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+      white-space: nowrap;
+    }
+
+    button.secondary {
+      background: #e5edff;
+      color: #1d4ed8;
+      box-shadow: none;
+    }
+
+    button.secondary:hover {
+      background: #dbe5ff;
+      box-shadow: none;
+    }
+
+    button:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 14px 22px rgba(37, 99, 235, 0.35);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.2);
+    }
+
+    .small-btn {
+      padding: 5px 10px;
+      font-size: 11px;
+      box-shadow: none;
+    }
+
+    #editorNamesSection { margin-bottom: 16px; }
+
+    .editor-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .editor-name-row span {
+      min-width: 110px;
+      color: var(--text-muted);
+    }
+
+    .subsection-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 8px;
+      margin-bottom: 4px;
+    }
+
+    .episode-meta-header,
+    .episode-meta-row {
+      display: grid;
+      /* # | Название | Монтажёр | Цвет | Звук | Старт | Смотрим */
+      grid-template-columns: 22px 200px 110px 110px 150px 150px 150px;
+      column-gap: 14px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .episode-meta-header {
+      margin-bottom: 4px;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .episode-meta-header div { padding-left: 2px; }
+
+    .episode-meta-row { margin-bottom: 6px; }
+
+    .episode-date-cell {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .episode-date-cell input[type="checkbox"] {
+      margin: 0;
+    }
+
+    .auto-date {
+      opacity: 0.6;
+    }
+
+    #updateScheduleBtn { margin-top: 8px; }
+
+    #result { margin-top: 0; }
+
+    .summary {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .recommended {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .status-ontrack {
+      background: #ecfdf3;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .status-late {
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 8px;
+    }
+
+    table {
+      border-collapse: collapse;
+      font-size: 11px;
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--border-subtle);
+      padding: 3px 4px;
+      text-align: center;
+      position: relative;
+      white-space: nowrap;
+    }
+
+    thead tr { background: #f9fafb; }
+
+    th.corner-cell {
+      position: sticky;
+      left: 0;
+      z-index: 4;
+      background: #f9fafb;
+    }
+
+    th.date-header {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-size: 9px;
+      padding: 2px 0;
+      color: var(--text-muted);
+    }
+
+    th.sunday-header {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    th.holiday-header {
+      color: #0f766e;
+      font-weight: 700;
+    }
+
+    td.sunday { background: var(--sunday-bg); }
+    td.holiday { background: var(--holiday-bg); }
+
+    tr:nth-child(even) td { background-color: #fcfcfd; }
+    tr:nth-child(even) td.sunday { background-color: #feecec; }
+    tr:nth-child(even) td.holiday { background-color: #dbeafe; }
+
+    .row-label {
+      font-weight: 600;
+      white-space: nowrap;
+      text-align: left;
+      padding-left: 8px;
+      background: #f9fafb;
+      position: sticky;
+      left: 0;
+      z-index: 3;
+    }
+
+    .legend {
+      margin-top: 10px;
+      font-size: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #eef2ff;
+      border: 1px solid #e0e7ff;
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      border: 1px solid #888;
+    }
+
+    /* Статистика */
+    #statsSection {
+      margin-top: 16px;
+    }
+
+    .stat-block-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    .stat-row span:first-child {
+      color: var(--text-muted);
+      margin-right: 6px;
+    }
+
+    .stat-placeholder {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Шапка карточки с графиком и fullscreen */
+    .result-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    #resultCard.fullscreen {
+      position: fixed;
+      inset: 12px;
+      z-index: 9999;
+      margin: 0;
+      max-height: calc(100vh - 24px);
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-card);
+    }
+
+    #resultCard.fullscreen .table-wrapper {
+      max-height: calc(100vh - 230px);
+    }
+
+    #resultCard.fullscreen #result {
+      overflow: auto;
+    }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      body { padding: 16px; }
+      .form-row { flex-direction: column; align-items: stretch; }
+      .row-label { position: static; }
+      th.corner-cell { position: static; }
+      #resultCard.fullscreen {
+        inset: 0;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <div>
+      <h1>ГРАФИК ПОСТА</h1>
+      <div class="hint">
+        Планирование работы монтажёров, проверки канала, сведения звука, цветокоррекции, блюра и шефа поста.
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- Левая колонка -->
+    <div>
+      <div id="controls" class="card">
+        <div class="card-title">ПАРАМЕТРЫ ПРОЕКТА</div>
+        <div class="card-subtitle">Введите данные проекта и нажмите «Построить график».</div>
+
+        <div class="form-row">
+          <label>
+            Количество серий
+            <input type="number" id="episodes" value="8" min="1" />
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>
+            Дата начала проекта
+            <input type="date" id="startDate" />
+          </label>
+          <label>
+            Дата окончания проекта
+            <input type="date" id="endDate" />
+          </label>
+        </div>
+
+        <!-- Каникулы -->
+        <div class="form-row">
+          <label>
+            Начало каникул
+            <input type="date" id="holidayStart" />
+          </label>
+          <label>
+            Конец каникул
+            <input type="date" id="holidayEnd" />
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>
+            Сколько серий монтирует Кирилл (для авто-распределения)
+            <input type="number" id="kirillEpisodes" value="0" min="0" />
+          </label>
+          <label>
+            Количество монтажёров
+            <input type="number" id="editorsCount" value="3" min="0" />
+          </label>
+        </div>
+
+        <div class="form-row">
+          <button id="buildBtn">Построить график</button>
+          <button id="exportBtn" class="secondary">Экспорт в Excel</button>
+          <button id="downloadProjectBtn" class="secondary">Скачать проект</button>
+          <button id="uploadProjectBtn" class="secondary">Загрузить проект</button>
+        </div>
+      </div>
+
+      <div id="editorNamesSection" class="card"></div>
+      <div id="statsSection" class="card"></div>
+    </div>
+
+    <!-- Правая колонка: календарь + информация по сериям -->
+    <div>
+      <div id="resultCard" class="card">
+        <div class="result-card-header">
+          <div class="card-title">КАЛЕНДАРЬ ПОСТПРОДАКШЕНА</div>
+          <button id="fullscreenToggleBtn" class="secondary small-btn">На весь экран</button>
+        </div>
+        <div id="result"></div>
+      </div>
+
+      <div id="episodesCard" class="card" style="margin-top:16px;">
+        <!-- сюда рендерится "Информация по сериям" -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Кнопка сброса данных -->
+  <div style="margin-top:16px; text-align:right;">
+    <button id="resetStateBtn" class="secondary">Сбросить данные</button>
+  </div>
+
+  <script>
+    // ===== НАСТРОЙКИ ЭТАПОВ (можно править) =====
+    const DAYS_EDIT_NO_RADIOS = 6;
+    const DAYS_WATCH_WITH_VLAD = 1;
+    const DAYS_VLAD_FIXES_AND_RADIOS = 3;
+    const DAYS_QC_REVIEW = 2;
+    const DAYS_EDITOR_FIX_AFTER_QC = 2;
+    const DAYS_POST_SUP_SEND = 1;
+    const DAYS_SOUND_AND_COLOR = 2;
+    const DAYS_BLUR = 2;
+    const DAYS_FINAL_MASTER = 1;
+    const DAYS_POST_SUP_UPLOAD = 1;
+
+    const SUNDAY = 0;
+    const STORAGE_KEY = 'postprod_schedule_state_v10';
+
+    // Каникулы
+    let holidayStartGlobal = null;
+    let holidayEndGlobal = null;
+
+    // Ступени пайплайна
+    const STAGES = [
+      { key: 'edit_no_radios', name: 'Монтаж без раций',                  role: 'editor',      duration: DAYS_EDIT_NO_RADIOS,        workingType: 'editor' },
+      { key: 'watch_vlad',     name: 'Смотрим с Владом',                  role: 'editor',      duration: DAYS_WATCH_WITH_VLAD,       workingType: 'editor' },
+      { key: 'vlad_fixes',     name: 'Правки Влада + рации',              role: 'editor',      duration: DAYS_VLAD_FIXES_AND_RADIOS, workingType: 'editor' },
+      { key: 'qc',             name: 'Проверка канала',                   role: 'qc',          duration: DAYS_QC_REVIEW,             workingType: 'qc'     },
+      { key: 'editor_fixes',   name: 'Правки после проверки',             role: 'editor',      duration: DAYS_EDITOR_FIX_AFTER_QC,   workingType: 'editor' },
+      { key: 'post_sup_send',  name: 'Шеф поста: отправка на цвет/звук',  role: 'post_sup',    duration: DAYS_POST_SUP_SEND,         workingType: 'editor' },
+      { key: 'sound_color',    name: 'Звук + цвет',                       role: 'sound_color', duration: DAYS_SOUND_AND_COLOR,       workingType: 'editor' },
+      { key: 'blur',           name: 'Блюр',                              role: 'blur',        duration: DAYS_BLUR,                  workingType: 'editor' },
+      { key: 'final_master',   name: 'Финальный мастер',                  role: 'editor',      duration: DAYS_FINAL_MASTER,          workingType: 'editor' },
+      { key: 'post_sup_up',    name: 'Шеф поста: загрузка на Асперу',     role: 'post_sup',    duration: DAYS_POST_SUP_UPLOAD,       workingType: 'editor' }
+    ];
+
+    // Глобальные "последние" состояния
+    let lastEditorNames = null;
+    let lastColoristNames = null;
+    let lastSoundNames = null;
+    let lastEpisodeTitles = null;
+    let lastEpisodeEditorAssignments = null;
+    let lastEpisodeColorAssignments = null;
+    let lastEpisodeSoundAssignments = null;
+    let lastEpisodeStartAutoFlags = null;
+    let lastEpisodeWatchAutoFlags = null;
+    window.lastScheduleData = null;
+
+    // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
+    function parseDate(value) {
+      if (!value) return null;
+      const [y, m, d] = value.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function cloneDate(date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
+    function addDays(date, n) {
+      const d = cloneDate(date);
+      d.setDate(d.getDate() + n);
+      return d;
+    }
+
+    function formatDate(date) {
+      const dd = String(date.getDate()).padStart(2, '0');
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const yyyy = date.getFullYear();
+      return `${dd}.${mm}.${yyyy}`;
+    }
+
+    function dateToInputValue(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function sameDay(a, b) {
+      return (
+        a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate()
+      );
+    }
+
+    function isSunday(date) { return date.getDay() === SUNDAY; }
+
+    function isHoliday(date) {
+      if (!holidayStartGlobal || !holidayEndGlobal) return false;
+      return date >= holidayStartGlobal && date <= holidayEndGlobal;
+    }
+
+    function isWorkingDayFor(type, date) {
+      if (isHoliday(date)) return false;
+      if (type === 'qc') {
+        const dow = date.getDay();
+        return dow >= 1 && dow <= 5;
+      }
+      return date.getDay() !== SUNDAY;
+    }
+
+    function buildDateRange(startDate, endDate) {
+      const result = [];
+      let d = cloneDate(startDate);
+      while (d <= endDate) {
+        result.push(cloneDate(d));
+        d.setDate(d.getDate() + 1);
+      }
+      return result;
+    }
+
+    function toISODateKey(date) {
+      return date.toISOString().slice(0, 10);
+    }
+
+    function countEditorWorkingDaysInRange(startDate, endDate) {
+      let d = cloneDate(startDate);
+      let count = 0;
+      while (d <= endDate) {
+        if (!isSunday(d) && !isHoliday(d)) count++;
+        d.setDate(d.getDate() + 1);
+      }
+      return count;
+    }
+
+    function colorForEpisode(index) {
+      const hue = (index * 65) % 360;
+      return `hsl(${hue}, 75%, 75%)`;
+    }
+
+    function excelColorForEpisode(index) {
+      const palette = [
+        '#ffe699', '#c6e0b4', '#bdd7ee', '#f8cbad',
+        '#d9e1f2', '#e2f0d9', '#fde9d9', '#d0cece',
+        '#b4c6e7', '#fff2cc', '#c9daf8', '#f4b183'
+      ];
+      return palette[(index - 1) % palette.length];
+    }
+
+    function defaultEpisodeTitles(count) {
+      const arr = [];
+      for (let i = 1; i <= count; i++) arr.push(`Серия ${i}`);
+      return arr;
+    }
+
+    function saveState(state) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn('Не удалось сохранить состояние', e);
+      }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (e) {
+        console.warn('Не удалось прочитать состояние', e);
+        return null;
+      }
+    }
+
+    // ===== РАСПРЕДЕЛЕНИЕ СЕРИЙ ПО МОНТАЖЁРАМ =====
+    function computeOwnerIds(episodesCount, kirillEpisodesInput, editorsCountOther, assignments) {
+      const totalEditors = 1 + Math.max(0, editorsCountOther); // 1 – Кирилл
+      const ownerIds = new Array(episodesCount).fill(null);
+      const explicit = assignments || [];
+
+      // 1. Применяем ручные назначения
+      for (let i = 0; i < episodesCount; i++) {
+        const ed = explicit[i];
+        if (ed && ed >= 1 && ed <= totalEditors) {
+          ownerIds[i] = ed;
+        }
+      }
+
+      if (totalEditors === 1) {
+        for (let i = 0; i < episodesCount; i++) {
+          if (!ownerIds[i]) ownerIds[i] = 1;
+        }
+        return ownerIds;
+      }
+
+      const forcedKirill = Math.max(
+        0,
+        Math.min(kirillEpisodesInput || 0, episodesCount)
+      );
+
+      let explicitKirill = 0;
+      for (let i = 0; i < episodesCount; i++) {
+        if (ownerIds[i] === 1) explicitKirill++;
+      }
+
+      let remainingKirill = Math.max(forcedKirill - explicitKirill, 0);
+
+      // добиваем Кирилла сериями с начала
+      for (let i = 0; i < episodesCount && remainingKirill > 0; i++) {
+        if (!ownerIds[i]) {
+          ownerIds[i] = 1;
+          remainingKirill--;
+        }
+      }
+
+      // остальные по кругу 2..N
+      let currentOtherId = 2;
+      for (let i = 0; i < episodesCount; i++) {
+        if (!ownerIds[i]) {
+          ownerIds[i] = currentOtherId;
+          currentOtherId++;
+          if (currentOtherId > totalEditors) currentOtherId = 2;
+        }
+      }
+
+      return ownerIds;
+    }
+
+    // ===== ПОДБОР КОЛИЧЕСТВА МОНТАЖЁРОВ =====
+    function recommendEditorsBySimulation(
+      episodesCount,
+      startDate,
+      plannedEndDate,
+      kirillEpisodesInput,
+      editorNames,
+      episodeStartDatesForSim,
+      episodeWatchDatesForSim,
+      coloristNames,
+      soundNames,
+      episodeColorAssignments,
+      episodeSoundAssignments
+    ) {
+      const maxEditorsToCheck = Math.min(episodesCount, 12);
+      let bestN = null;
+      let bestEndOverall = null;
+
+      for (let n = 0; n <= maxEditorsToCheck; n++) {
+        const ownerIdsTest = computeOwnerIds(
+          episodesCount,
+          kirillEpisodesInput,
+          n,
+          null
+        );
+
+        const simTest = simulateSchedule(
+          episodesCount,
+          startDate,
+          n,
+          ownerIdsTest,
+          episodeStartDatesForSim,
+          editorNames,
+          episodeWatchDatesForSim,
+          coloristNames,
+          soundNames,
+          episodeColorAssignments,
+          episodeSoundAssignments
+        );
+
+        if (!bestEndOverall || simTest.actualEndDate < bestEndOverall) {
+          bestEndOverall = simTest.actualEndDate;
+        }
+
+        if (simTest.actualEndDate <= plannedEndDate) {
+          if (bestN === null || n < bestN) bestN = n;
+        }
+      }
+
+      return { bestN, maxChecked: maxEditorsToCheck, bestEndOverall };
+    }
+
+    // подбор: максимум серий для Кирилла при текущем числе остальных монтажёров
+    function recommendKirillEpisodesBySimulation(
+      episodesCount,
+      startDate,
+      plannedEndDate,
+      editorsCountOther,
+      editorNames,
+      episodeStartDatesForSim,
+      episodeWatchDatesForSim,
+      coloristNames,
+      soundNames,
+      episodeColorAssignments,
+      episodeSoundAssignments,
+      explicitAssignments
+    ) {
+      let bestK = 0;
+      let bestEndOverall = null;
+      const maxK = episodesCount;
+
+      for (let k = 0; k <= maxK; k++) {
+        const ownerIdsTest = computeOwnerIds(
+          episodesCount,
+          k,
+          editorsCountOther,
+          explicitAssignments
+        );
+
+        const simTest = simulateSchedule(
+          episodesCount,
+          startDate,
+          editorsCountOther,
+          ownerIdsTest,
+          episodeStartDatesForSim,
+          editorNames,
+          episodeWatchDatesForSim,
+          coloristNames,
+          soundNames,
+          episodeColorAssignments,
+          episodeSoundAssignments
+        );
+
+        if (!bestEndOverall || simTest.actualEndDate < bestEndOverall) {
+          bestEndOverall = simTest.actualEndDate;
+        }
+
+        if (simTest.actualEndDate <= plannedEndDate && k > bestK) {
+          bestK = k;
+        }
+      }
+
+      return { bestK, bestEndOverall };
+    }
+
+    // ===== ИМЕНА ИСПОЛНИТЕЛЕЙ =====
+    function renderEditorNamesSection(kirillEpisodes, editorsCountOther, prevEditorNames, prevColorNames, prevSoundNames) {
+      const section = document.getElementById('editorNamesSection');
+      section.innerHTML = '';
+
+      const title = document.createElement('div');
+      title.className = 'card-title';
+      title.textContent = 'ИСПОЛНИТЕЛИ';
+      section.appendChild(title);
+
+      const hint = document.createElement('div');
+      hint.className = 'card-subtitle';
+      hint.style.marginBottom = '6px';
+      hint.textContent = 'Эти имена появятся в календаре и в списке серий.';
+      section.appendChild(hint);
+
+      const editorNames = prevEditorNames || { kirillName: 'Кирилл', otherNames: [] };
+
+      // Монтажёры
+      const sub1 = document.createElement('div');
+      sub1.className = 'subsection-title';
+      sub1.textContent = 'МОНТАЖЁРЫ';
+      section.appendChild(sub1);
+
+      {
+        const row = document.createElement('div');
+        row.className = 'editor-name-row';
+        const label = document.createElement('span');
+        label.textContent = 'Кирилл:';
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'kirillNameInput';
+        input.value = editorNames.kirillName || 'Кирилл';
+        row.appendChild(label);
+        row.appendChild(input);
+        section.appendChild(row);
+      }
+
+      for (let i = 1; i <= editorsCountOther; i++) {
+        const row = document.createElement('div');
+        row.className = 'editor-name-row';
+        const label = document.createElement('span');
+        label.textContent = `Монтажёр ${i}:`;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = `editorName-${i}`;
+        const def = `Монтажёр ${i}`;
+        input.value = (editorNames.otherNames && editorNames.otherNames[i - 1]) || def;
+        row.appendChild(label);
+        row.appendChild(input);
+        section.appendChild(row);
+      }
+
+      // Колористы
+      const colorNames = prevColorNames || ['Колорист 1', 'Колорист 2'];
+      const sub2 = document.createElement('div');
+      sub2.className = 'subsection-title';
+      sub2.textContent = 'КОЛОРИСТЫ';
+      section.appendChild(sub2);
+
+      for (let i = 1; i <= 2; i++) {
+        const row = document.createElement('div');
+        row.className = 'editor-name-row';
+        const label = document.createElement('span');
+        label.textContent = `Колорист ${i}:`;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = `coloristName-${i}`;
+        const def = `Колорист ${i}`;
+        input.value = colorNames[i - 1] || def;
+        row.appendChild(label);
+        row.appendChild(input);
+        section.appendChild(row);
+      }
+
+      // Звукорежиссёры
+      const soundNames = prevSoundNames || ['Звукорежиссёр 1', 'Звукорежиссёр 2'];
+      const sub3 = document.createElement('div');
+      sub3.className = 'subsection-title';
+      sub3.textContent = 'ЗВУКОРЕЖИССЁРЫ';
+      section.appendChild(sub3);
+
+      for (let i = 1; i <= 2; i++) {
+        const row = document.createElement('div');
+        row.className = 'editor-name-row';
+        const label = document.createElement('span');
+        label.textContent = `Звукорежиссёр ${i}:`;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = `soundName-${i}`;
+        const def = `Звукорежиссёр ${i}`;
+        input.value = soundNames[i - 1] || def;
+        row.appendChild(label);
+        row.appendChild(input);
+        section.appendChild(row);
+      }
+    }
+
+    function getNamesFromInputs(kirillEpisodes, editorsCountOther) {
+      const editorNames = { kirillName: 'Кирилл', otherNames: [] };
+      const kInp = document.getElementById('kirillNameInput');
+      if (kInp && kInp.value.trim()) editorNames.kirillName = kInp.value.trim();
+      for (let i = 1; i <= editorsCountOther; i++) {
+        const inp = document.getElementById(`editorName-${i}`);
+        const def = `Монтажёр ${i}`;
+        editorNames.otherNames.push(inp && inp.value.trim() ? inp.value.trim() : def);
+      }
+
+      const coloristNames = [];
+      for (let i = 1; i <= 2; i++) {
+        const inp = document.getElementById(`coloristName-${i}`);
+        const def = `Колорист ${i}`;
+        coloristNames.push(inp && inp.value.trim() ? inp.value.trim() : def);
+      }
+
+      const soundNames = [];
+      for (let i = 1; i <= 2; i++) {
+        const inp = document.getElementById(`soundName-${i}`);
+        const def = `Звукорежиссёр ${i}`;
+        soundNames.push(inp && inp.value.trim() ? inp.value.trim() : def);
+      }
+
+      return { editorNames, coloristNames, soundNames };
+    }
+
+    // ===== СТАТИСТИКА =====
+    function renderStatsSection(editors, colorists, sounders, ownerIds, blocks) {
+      const section = document.getElementById('statsSection');
+      if (!section) return;
+
+      section.innerHTML = '';
+
+      const title = document.createElement('div');
+      title.className = 'card-title';
+      title.textContent = 'СТАТИСТИКА';
+      section.appendChild(title);
+
+      const subtitle = document.createElement('div');
+      subtitle.className = 'card-subtitle';
+      subtitle.textContent =
+        'Сколько серий и рабочих дней у каждого исполнителя (по итогам симуляции).';
+      section.appendChild(subtitle);
+
+      const btnRow = document.createElement('div');
+      btnRow.style.marginBottom = '6px';
+      const refreshBtn = document.createElement('button');
+      refreshBtn.textContent = 'Обновить';
+      refreshBtn.className = 'secondary small-btn';
+      refreshBtn.addEventListener('click', updateStatsFromLastSchedule);
+      btnRow.appendChild(refreshBtn);
+      section.appendChild(btnRow);
+
+      if (!editors || !ownerIds || !blocks) {
+        const p = document.createElement('div');
+        p.className = 'stat-placeholder';
+        p.textContent = 'Постройте график, чтобы увидеть статистику.';
+        section.appendChild(p);
+        return;
+      }
+
+      // --- МОНТАЖЁРЫ ---
+      const editorStats = new Map();
+      editors.forEach(ed => {
+        editorStats.set(ed.id, {
+          name: ed.name,
+          episodes: 0,
+          daysSet: new Set()
+        });
+      });
+
+      ownerIds.forEach(edId => {
+        const rec = editorStats.get(edId);
+        if (rec) rec.episodes++;
+      });
+
+      const postSupDaysByEditor = new Map();
+
+      blocks.forEach(b => {
+        if (b.role === 'editor' && b.editorId && editorStats.has(b.editorId)) {
+          const rec = editorStats.get(b.editorId);
+          let d = cloneDate(b.start);
+          while (d <= b.end) {
+            if (isWorkingDayFor('editor', d)) {
+              rec.daysSet.add(toISODateKey(d));
+            }
+            d = addDays(d, 1);
+          }
+        }
+
+        if (b.role === 'post_sup' && b.editorId) {
+          let set = postSupDaysByEditor.get(b.editorId);
+          if (!set) {
+            set = new Set();
+            postSupDaysByEditor.set(b.editorId, set);
+          }
+          let d = cloneDate(b.start);
+          while (d <= b.end) {
+            if (isWorkingDayFor('editor', d)) {
+              set.add(toISODateKey(d));
+            }
+            d = addDays(d, 1);
+          }
+        }
+      });
+
+      // --- КОЛОРИСТЫ ---
+      const colorStats = new Map();
+      if (colorists) {
+        colorists.forEach(c => {
+          colorStats.set(c.id, {
+            name: c.name,
+            episodes: new Set(),
+            daysSet: new Set()
+          });
+        });
+      }
+
+      // --- ЗВУК ---
+      const soundStats = new Map();
+      if (sounders) {
+        sounders.forEach(s => {
+          soundStats.set(s.id, {
+            name: s.name,
+            episodes: new Set(),
+            daysSet: new Set()
+          });
+        });
+      }
+
+      blocks.forEach(b => {
+        if (b.role === 'colorist' && colorStats.has(b.editorId)) {
+          const rec = colorStats.get(b.editorId);
+          rec.episodes.add(b.episodeId);
+          let d = cloneDate(b.start);
+          while (d <= b.end) {
+            if (isWorkingDayFor('editor', d)) {
+              rec.daysSet.add(toISODateKey(d));
+            }
+            d = addDays(d, 1);
+          }
+        }
+        if (b.role === 'sound' && soundStats.has(b.editorId)) {
+          const rec = soundStats.get(b.editorId);
+          rec.episodes.add(b.episodeId);
+          let d = cloneDate(b.start);
+          while (d <= b.end) {
+            if (isWorkingDayFor('editor', d)) {
+              rec.daysSet.add(toISODateKey(d));
+            }
+            d = addDays(d, 1);
+          }
+        }
+      });
+
+      // МОНТАЖЁРЫ (вывод)
+      const eTitle = document.createElement('div');
+      eTitle.className = 'stat-block-title';
+      eTitle.textContent = 'МОНТАЖЁРЫ';
+      section.appendChild(eTitle);
+
+      editorStats.forEach(rec => {
+        const row = document.createElement('div');
+        row.className = 'stat-row';
+        const left = document.createElement('span');
+        left.textContent = rec.name;
+        const right = document.createElement('span');
+        right.textContent = `${rec.episodes} серий · ${rec.daysSet.size} рабочих дней`;
+        row.appendChild(left);
+        row.appendChild(right);
+        section.appendChild(row);
+      });
+
+      // Доп. строка "Кирилл + шеф"
+      const kirill = editorStats.get(1);
+      if (kirill) {
+        const postSet = postSupDaysByEditor.get(1) || new Set();
+        const union = new Set([...kirill.daysSet, ...postSet]);
+
+        const row = document.createElement('div');
+        row.className = 'stat-row';
+        row.style.marginTop = '4px';
+        const left = document.createElement('span');
+        left.textContent = 'Кирилл + шеф';
+        const right = document.createElement('span');
+        right.textContent = `${kirill.episodes} серий · ${union.size} рабочих дней`;
+        row.appendChild(left);
+        row.appendChild(right);
+        section.appendChild(row);
+      }
+
+      // КОЛОРИСТЫ
+      const cTitle = document.createElement('div');
+      cTitle.className = 'stat-block-title';
+      cTitle.textContent = 'КОЛОРИСТЫ';
+      section.appendChild(cTitle);
+
+      colorStats.forEach(rec => {
+        const row = document.createElement('div');
+        row.className = 'stat-row';
+        const left = document.createElement('span');
+        left.textContent = rec.name;
+        const right = document.createElement('span');
+        right.textContent = `${rec.episodes.size} серий · ${rec.daysSet.size} рабочих дней`;
+        row.appendChild(left);
+        row.appendChild(right);
+        section.appendChild(row);
+      });
+
+      // ЗВУКОРЕЖИССЁРЫ
+      const sTitle = document.createElement('div');
+      sTitle.className = 'stat-block-title';
+      sTitle.textContent = 'ЗВУКОРЕЖИССЁРЫ';
+      section.appendChild(sTitle);
+
+      soundStats.forEach(rec => {
+        const row = document.createElement('div');
+        row.className = 'stat-row';
+        const left = document.createElement('span');
+        left.textContent = rec.name;
+        const right = document.createElement('span');
+        right.textContent = `${rec.episodes.size} серий · ${rec.daysSet.size} рабочих дней`;
+        row.appendChild(left);
+        row.appendChild(right);
+        section.appendChild(row);
+      });
+    }
+
+    function updateStatsFromLastSchedule() {
+      const data = window.lastScheduleData;
+      if (!data) {
+        alert('Сначала постройте график.');
+        return;
+      }
+
+      const episodesCount = data.episodesCount;
+      const kirillEpisodes = data.kirillEpisodesInput || 0;
+      const editorsCountOther = data.editorsCountOther || 0;
+
+      const assignments =
+        lastEpisodeEditorAssignments || new Array(episodesCount).fill(null);
+
+      const ownerIds = computeOwnerIds(
+        episodesCount,
+        kirillEpisodes,
+        editorsCountOther,
+        assignments
+      );
+
+      renderStatsSection(
+        data.editors,
+        data.colorists,
+        data.sounders,
+        ownerIds,
+        data.blocks
+      );
+    }
+
+    // ===== БЛОК "ИНФОРМАЦИЯ ПО СЕРИЯМ" =====
+    function renderEpisodesMetaBlock(
+      parent,
+      episodesCount,
+      titles,
+      episodeStartDatesActual,
+      episodeWatchDatesActual,
+      startDate,
+      endDate,
+      editors,
+      episodeAssignments,
+      coloristNames,
+      soundNames,
+      episodeColorAssignments,
+      episodeSoundAssignments,
+      startAutoFlags,
+      watchAutoFlags,
+      episodeStartManual,
+      episodeWatchManual
+    ) {
+      if (!parent) return;
+      parent.innerHTML = '';
+
+      const titleEl = document.createElement('div');
+      titleEl.className = 'card-title';
+      titleEl.textContent = 'ИНФОРМАЦИЯ ПО СЕРИЯМ';
+      parent.appendChild(titleEl);
+
+      const hint = document.createElement('div');
+      hint.className = 'card-subtitle';
+      hint.textContent =
+        'Название, исполнители, старт монтажа и день «Смотрим с Владом». Если чекбокс «Авто» включён — даты считаются автоматически.';
+      parent.appendChild(hint);
+
+      const block = document.createElement('div');
+      block.id = 'episodesMetaBlock';
+      block.style.marginTop = '6px';
+
+      const header = document.createElement('div');
+      header.className = 'episode-meta-header';
+      header.innerHTML = `
+        <div>#</div>
+        <div>Название</div>
+        <div>Монтажёр</div>
+        <div>Цвет</div>
+        <div>Звук</div>
+        <div class="episode-start-header">Старт монтажа</div>
+        <div>Смотрим с Владом</div>
+      `;
+      block.appendChild(header);
+
+      const titlesArr = titles || defaultEpisodeTitles(episodesCount);
+      const assigns = episodeAssignments || [];
+      const colorAssigns = episodeColorAssignments || [];
+      const soundAssigns = episodeSoundAssignments || [];
+
+      const startAutoEff = startAutoFlags && startAutoFlags.length === episodesCount
+        ? startAutoFlags
+        : new Array(episodesCount).fill(true);
+      const watchAutoEff = watchAutoFlags && watchAutoFlags.length === episodesCount
+        ? watchAutoFlags
+        : new Array(episodesCount).fill(true);
+
+      for (let ep = 1; ep <= episodesCount; ep++) {
+        const idx = ep - 1;
+        const row = document.createElement('div');
+        row.className = 'episode-meta-row';
+
+        const label = document.createElement('div');
+        label.textContent = `S${ep}`;
+        row.appendChild(label);
+
+        const titleInput = document.createElement('input');
+        titleInput.type = 'text';
+        titleInput.id = `epTitle-${ep}`;
+        titleInput.value = titlesArr[idx] || `Серия ${ep}`;
+        row.appendChild(titleInput);
+
+        // Монтажёр
+        const editorCell = document.createElement('div');
+        const selEditor = document.createElement('select');
+        selEditor.id = `epEditor-${ep}`;
+        {
+          const emptyOpt = document.createElement('option');
+          emptyOpt.value = '';
+          emptyOpt.textContent = 'Авто';
+          selEditor.appendChild(emptyOpt);
+          editors.forEach(ed => {
+            const opt = document.createElement('option');
+            opt.value = String(ed.id);
+            opt.textContent = ed.name;
+            selEditor.appendChild(opt);
+          });
+          const assignedId = assigns[idx];
+          if (assignedId) selEditor.value = String(assignedId);
+        }
+        editorCell.appendChild(selEditor);
+        row.appendChild(editorCell);
+
+        // Цвет
+        const colorCell = document.createElement('div');
+        const selColor = document.createElement('select');
+        selColor.id = `epColor-${ep}`;
+        {
+          const emptyOpt = document.createElement('option');
+          emptyOpt.value = '';
+          emptyOpt.textContent = 'Авто';
+          selColor.appendChild(emptyOpt);
+          coloristNames.forEach((name, i) => {
+            const id = i + 1;
+            const opt = document.createElement('option');
+            opt.value = String(id);
+            opt.textContent = name;
+            selColor.appendChild(opt);
+          });
+          const assignedColor = colorAssigns[idx];
+          if (assignedColor) selColor.value = String(assignedColor);
+        }
+        colorCell.appendChild(selColor);
+        row.appendChild(colorCell);
+
+        // Звук
+        const soundCell = document.createElement('div');
+        const selSound = document.createElement('select');
+        selSound.id = `epSound-${ep}`;
+        {
+          const emptyOpt = document.createElement('option');
+          emptyOpt.value = '';
+          emptyOpt.textContent = 'Авто';
+          selSound.appendChild(emptyOpt);
+          soundNames.forEach((name, i) => {
+            const id = i + 1;
+            const opt = document.createElement('option');
+            opt.value = String(id);
+            opt.textContent = name;
+            selSound.appendChild(opt);
+          });
+          const assignedSound = soundAssigns[idx];
+          if (assignedSound) selSound.value = String(assignedSound);
+        }
+        soundCell.appendChild(selSound);
+        row.appendChild(soundCell);
+
+        // Старт монтажа
+        const startCell = document.createElement('div');
+        startCell.className = 'episode-date-cell episode-start-cell';
+
+        const cbStart = document.createElement('input');
+        cbStart.type = 'checkbox';
+        cbStart.id = `epStartAuto-${ep}`;
+        cbStart.checked = startAutoEff[idx];
+
+        const startInput = document.createElement('input');
+        startInput.type = 'date';
+        startInput.id = `epStart-${ep}`;
+
+        const autoStartDate = episodeStartDatesActual[idx] || startDate;
+        const manualStartDate = episodeStartManual && episodeStartManual[idx]
+          ? episodeStartManual[idx]
+          : autoStartDate;
+
+        if (startAutoEff[idx]) {
+          startInput.value = dateToInputValue(autoStartDate);
+          startInput.disabled = true;
+          startInput.classList.add('auto-date');
+        } else {
+          startInput.value = dateToInputValue(manualStartDate);
+          startInput.disabled = false;
+        }
+
+        cbStart.addEventListener('change', () => {
+          const isAuto = cbStart.checked;
+          if (isAuto) {
+            startInput.value = dateToInputValue(autoStartDate);
+            startInput.disabled = true;
+            startInput.classList.add('auto-date');
+          } else {
+            startInput.disabled = false;
+            startInput.classList.remove('auto-date');
+          }
+        });
+
+        startCell.appendChild(cbStart);
+        startCell.appendChild(startInput);
+        row.appendChild(startCell);
+
+        // Смотрим с Владом
+        const watchCell = document.createElement('div');
+        watchCell.className = 'episode-date-cell';
+
+        const cbWatch = document.createElement('input');
+        cbWatch.type = 'checkbox';
+        cbWatch.id = `epWatchAuto-${ep}`;
+        cbWatch.checked = watchAutoEff[idx];
+
+        const watchInput = document.createElement('input');
+        watchInput.type = 'date';
+        watchInput.id = `epWatch-${ep}`;
+
+        const autoWatchDate = episodeWatchDatesActual[idx] || startDate;
+        const manualWatchDate = episodeWatchManual && episodeWatchManual[idx]
+          ? episodeWatchManual[idx]
+          : autoWatchDate;
+
+        if (watchAutoEff[idx]) {
+          watchInput.value = dateToInputValue(autoWatchDate);
+          watchInput.disabled = true;
+          watchInput.classList.add('auto-date');
+        } else {
+          watchInput.value = dateToInputValue(manualWatchDate);
+          watchInput.disabled = false;
+        }
+
+        cbWatch.addEventListener('change', () => {
+          const isAuto = cbWatch.checked;
+          if (isAuto) {
+            watchInput.value = dateToInputValue(autoWatchDate);
+            watchInput.disabled = true;
+            watchInput.classList.add('auto-date');
+          } else {
+            watchInput.disabled = false;
+            watchInput.classList.remove('auto-date');
+          }
+        });
+
+        watchCell.appendChild(cbWatch);
+        watchCell.appendChild(watchInput);
+        row.appendChild(watchCell);
+
+        block.appendChild(row);
+      }
+
+      const btn = document.createElement('button');
+      btn.id = 'updateScheduleBtn';
+      btn.textContent = 'Обновить график';
+      block.appendChild(btn);
+
+      parent.appendChild(block);
+
+      // обработчик "Обновить график"
+      btn.addEventListener('click', () => {
+        const episodesCount = parseInt(document.getElementById('episodes').value, 10);
+        const projectStart = parseDate(document.getElementById('startDate').value);
+        const projectEnd = parseDate(document.getElementById('endDate').value);
+        const kirillEpisodes = parseInt(document.getElementById('kirillEpisodes').value, 10) || 0;
+        const editorsCountOther = parseInt(document.getElementById('editorsCount').value, 10) || 0;
+
+        const { editorNames, coloristNames: colNames, soundNames: sndNames } =
+          getNamesFromInputs(kirillEpisodes, editorsCountOther);
+
+        lastEditorNames = editorNames;
+        lastColoristNames = colNames;
+        lastSoundNames = sndNames;
+
+        const titlesNew = [];
+        const assignmentsNew = [];
+        const colorAssignmentsNew = [];
+        const soundAssignmentsNew = [];
+        const startAutoFlagsNew = [];
+        const watchAutoFlagsNew = [];
+        const episodeStartForSim = [];
+        const episodeWatchForSim = [];
+
+        for (let ep = 1; ep <= episodesCount; ep++) {
+          const idx = ep - 1;
+
+          const vTitle = document.getElementById(`epTitle-${ep}`).value.trim();
+          titlesNew.push(vTitle || `Серия ${ep}`);
+
+          const selEd = document.getElementById(`epEditor-${ep}`);
+          assignmentsNew.push(selEd.value ? parseInt(selEd.value, 10) : null);
+
+          const selColor = document.getElementById(`epColor-${ep}`);
+          colorAssignmentsNew.push(selColor.value ? parseInt(selColor.value, 10) : null);
+
+          const selSound = document.getElementById(`epSound-${ep}`);
+          soundAssignmentsNew.push(selSound.value ? parseInt(selSound.value, 10) : null);
+
+          const cbStart = document.getElementById(`epStartAuto-${ep}`);
+          const cbWatch = document.getElementById(`epWatchAuto-${ep}`);
+          const isStartAuto = !cbStart ? true : cbStart.checked;
+          const isWatchAuto = !cbWatch ? true : cbWatch.checked;
+          startAutoFlagsNew[idx] = isStartAuto;
+          watchAutoFlagsNew[idx] = isWatchAuto;
+
+          const vStart = document.getElementById(`epStart-${ep}`).value;
+          const vWatch = document.getElementById(`epWatch-${ep}`).value;
+
+          let dStartManual = vStart ? parseDate(vStart) : null;
+          let dWatchManual = vWatch ? parseDate(vWatch) : null;
+
+          if (isStartAuto || !dStartManual) {
+            episodeStartForSim[idx] = null;
+          } else {
+            episodeStartForSim[idx] = dStartManual;
+          }
+
+          if (isWatchAuto || !dWatchManual) {
+            episodeWatchForSim[idx] = null;
+          } else {
+            episodeWatchForSim[idx] = dWatchManual;
+          }
+        }
+
+        lastEpisodeTitles = titlesNew;
+        lastEpisodeEditorAssignments = assignmentsNew;
+        lastEpisodeColorAssignments = colorAssignmentsNew;
+        lastEpisodeSoundAssignments = soundAssignmentsNew;
+        lastEpisodeStartAutoFlags = startAutoFlagsNew;
+        lastEpisodeWatchAutoFlags = watchAutoFlagsNew;
+
+        buildTableWithRoles(
+          episodesCount,
+          projectStart,
+          projectEnd,
+          kirillEpisodes,
+          editorsCountOther,
+          editorNames,
+          colNames,
+          sndNames,
+          episodeStartForSim,
+          episodeWatchForSim,
+          titlesNew,
+          assignmentsNew,
+          colorAssignmentsNew,
+          soundAssignmentsNew,
+          startAutoFlagsNew,
+          watchAutoFlagsNew
+        );
+      });
+    }
+
+    // ===== СИМУЛЯЦИЯ ГРАФИКА (с приоритетом старых серий) =====
+    function simulateSchedule(
+      episodesCount,
+      projectStartDate,
+      editorsCountOther,
+      episodeOwnerIds,
+      episodeStartDatesForSim,
+      editorNames,
+      episodeWatchDatesForSim,
+      coloristNames,
+      soundNames,
+      episodeColorAssignments,
+      episodeSoundAssignments
+    ) {
+      const totalEditors = 1 + Math.max(0, editorsCountOther);
+      const names = editorNames || { kirillName: 'Кирилл', otherNames: [] };
+
+      // Монтажёры
+      const editors = [];
+      let otherIndex = 1;
+      for (let i = 0; i < totalEditors; i++) {
+        let type, name;
+        if (i === 0) {
+          type = 'kirill';
+          name = names.kirillName || 'Кирилл';
+        } else {
+          type = 'other';
+          const idx = otherIndex - 1;
+          name =
+            (names.otherNames && names.otherNames[idx]) || `Монтажёр ${otherIndex}`;
+          otherIndex++;
+        }
+        editors.push({ id: i + 1, name, type, currentTask: null });
+      }
+
+      // Колористы
+      const colorists = [];
+      const colNames = coloristNames || ['Колорист 1', 'Колорист 2'];
+      for (let i = 0; i < 2; i++) {
+        colorists.push({
+          id: i + 1,
+          name: colNames[i] || `Колорист ${i + 1}`,
+          currentTask: null,
+        });
+      }
+
+      // Звукорежиссёры
+      const sounders = [];
+      const sndNames = soundNames || ['Звукорежиссёр 1', 'Звукорежиссёр 2'];
+      for (let i = 0; i < 2; i++) {
+        sounders.push({
+          id: i + 1,
+          name: sndNames[i] || `Звукорежиссёр ${i + 1}`,
+          currentTask: null,
+        });
+      }
+
+      // Серии
+      const episodes = [];
+      for (let i = 0; i < episodesCount; i++) {
+        const stagesState = STAGES.map((def) => ({
+          def,
+          status: 'pending',
+          remaining: def.duration,
+          start: null,
+          end: null,
+          readyDate: null,
+          assignedEditor: null,
+          assignedColoristId: null,
+          assignedSoundId: null,
+        }));
+
+        let firstStart =
+          episodeStartDatesForSim && episodeStartDatesForSim[i]
+            ? cloneDate(episodeStartDatesForSim[i])
+            : cloneDate(projectStartDate);
+
+        if (firstStart < projectStartDate) firstStart = cloneDate(projectStartDate);
+        stagesState[0].readyDate = firstStart;
+
+        const ownerId = episodeOwnerIds[i] || 1;
+
+        episodes.push({
+          id: i + 1,
+          ownerId,
+          stages: stagesState,
+          currentStageIndex: 0,
+          activeStageIndex: null,
+        });
+      }
+
+      const watchOverrides = episodeWatchDatesForSim || [];
+      const colorPrefs = episodeColorAssignments || [];
+      const soundPrefs = episodeSoundAssignments || [];
+
+      const blocks = [];
+      let date = cloneDate(projectStartDate);
+      let safetyCounter = 0;
+
+      while (true) {
+        safetyCounter++;
+        if (safetyCounter > 4000) break;
+
+        let vladCapacity = 2;
+        let blurCapacity = 1;
+
+        const readyStagesPerEditor = new Map();
+        const readyQC = [];
+        const readySoundColor = [];
+        const readyBlur = [];
+        let postSupWorkedToday = false;
+
+        // лимиты шефа поста
+        let postSupSendCapacity = 1;
+        let postSupUploadCapacity = 4;
+
+        function pushForEditor(edId, task) {
+          let arr = readyStagesPerEditor.get(edId);
+          if (!arr) {
+            arr = [];
+            readyStagesPerEditor.set(edId, arr);
+          }
+          arr.push(task);
+        }
+
+        // 1) ШЕФ ПОСТА (приоритет)
+        episodes.forEach((ep) => {
+          if (ep.currentStageIndex >= STAGES.length) return;
+          const stState = ep.stages[ep.currentStageIndex];
+          const def = stState.def;
+
+          if (def.role !== 'post_sup') return;
+          if (!stState.readyDate || stState.readyDate > date) return;
+          if (!isWorkingDayFor(def.workingType, date)) return;
+
+          if (def.key === 'post_sup_send') {
+            if (postSupSendCapacity <= 0) return;
+          } else if (def.key === 'post_sup_up') {
+            if (postSupUploadCapacity <= 0) return;
+          }
+
+          if (!stState.start) {
+            stState.status = 'inProgress';
+            stState.start = cloneDate(date);
+          }
+
+          stState.remaining--;
+
+          if (def.key === 'post_sup_send') {
+            postSupWorkedToday = true;
+            postSupSendCapacity--;
+          } else if (def.key === 'post_sup_up') {
+            postSupUploadCapacity--;
+          }
+
+          if (stState.remaining <= 0) {
+            stState.status = 'done';
+            stState.end = cloneDate(date);
+
+            blocks.push({
+              episodeId: ep.id,
+              stageKey: def.key,
+              label: def.name,
+              role: def.role,
+              start: cloneDate(stState.start),
+              end: cloneDate(stState.end),
+              editorId: 1,
+            });
+
+            ep.currentStageIndex = ep.currentStageIndex + 1;
+            ep.activeStageIndex = null;
+
+            if (ep.currentStageIndex < STAGES.length) {
+              const nextState = ep.stages[ep.currentStageIndex];
+
+              let candidate;
+              if (def.key === 'post_sup_send' && nextState.def.key === 'sound_color') {
+                candidate = cloneDate(date); // цвет/звук стартуют в этот же день
+              } else {
+                candidate = addDays(date, 1);
+                if (
+                  nextState.def.key === 'watch_vlad' &&
+                  watchOverrides[ep.id - 1]
+                ) {
+                  const override = cloneDate(watchOverrides[ep.id - 1]);
+                  if (override > candidate) candidate = override;
+                }
+              }
+
+              nextState.readyDate = candidate;
+            }
+          }
+        });
+
+        // 2) Сбор готовых задач (кроме шефа)
+        episodes.forEach((ep) => {
+          if (ep.activeStageIndex !== null) return;
+          if (ep.currentStageIndex >= STAGES.length) return;
+
+          const stState = ep.stages[ep.currentStageIndex];
+          const def = stState.def;
+
+          if (def.role === 'post_sup') return;
+          if (!stState.readyDate || stState.readyDate > date) return;
+          if (!isWorkingDayFor(def.workingType, date)) return;
+
+          const task = { ep, stIndex: ep.currentStageIndex, state: stState };
+
+          if (def.role === 'editor') {
+            pushForEditor(ep.ownerId, task);
+          } else if (def.role === 'qc') {
+            readyQC.push(task);
+          } else if (def.role === 'sound_color') {
+            readySoundColor.push(task);
+          } else if (def.role === 'blur') {
+            readyBlur.push(task);
+          }
+        });
+
+        // Паузим новые серии, если есть старые в очереди
+        editors.forEach((ed) => {
+          if (!ed.currentTask) return;
+
+          const arr = readyStagesPerEditor.get(ed.id) || [];
+          if (arr.length === 0) return;
+
+          let minReadyEpId = null;
+          for (const t of arr) {
+            if (minReadyEpId === null || t.ep.id < minReadyEpId) {
+              minReadyEpId = t.ep.id;
+            }
+          }
+          if (minReadyEpId === null) return;
+
+          const activeEp = episodes.find(
+            (ep) => ep.id === ed.currentTask.episodeId
+          );
+          if (!activeEp) return;
+          const activeStageIndex = ed.currentTask.stageIndex;
+          const activeState = activeEp.stages[activeStageIndex];
+          const def = activeState.def;
+
+          if (def.role !== 'editor') return;
+
+          if (minReadyEpId < activeEp.id) {
+            activeEp.activeStageIndex = null;
+            activeState.status = 'pending';
+            arr.push({ ep: activeEp, stIndex: activeStageIndex, state: activeState });
+            readyStagesPerEditor.set(ed.id, arr);
+            ed.currentTask = null;
+          }
+        });
+
+        readyStagesPerEditor.forEach((arr) => {
+          arr.sort((a, b) => a.ep.id - b.ep.id);
+        });
+
+        // 3) МОНТАЖЁРЫ
+        editors.forEach((ed) => {
+          if (postSupWorkedToday && ed.id === 1) return;
+          if (ed.currentTask) return;
+
+          const arr = readyStagesPerEditor.get(ed.id);
+          if (!arr || arr.length === 0) return;
+
+          for (let i = 0; i < arr.length; i++) {
+            const task = arr[i];
+            const def = task.state.def;
+            if (def.key === 'watch_vlad' && vladCapacity <= 0) continue;
+
+            task.state.status = 'inProgress';
+            if (!task.state.start) task.state.start = cloneDate(date);
+            task.state.assignedEditor = ed.id;
+            task.ep.activeStageIndex = task.stIndex;
+            ed.currentTask = { episodeId: task.ep.id, stageIndex: task.stIndex };
+            if (def.key === 'watch_vlad') vladCapacity--;
+
+            arr.splice(i, 1);
+            break;
+          }
+        });
+
+        // 4) QC
+        readyQC.forEach((task) => {
+          const stState = task.state;
+          if (stState.status === 'pending') {
+            stState.status = 'inProgress';
+            if (!stState.start) stState.start = cloneDate(date);
+            task.ep.activeStageIndex = task.stIndex;
+          }
+        });
+
+        // 5) ЗВУК + ЦВЕТ
+        readySoundColor.forEach((task) => {
+          const stState = task.state;
+          if (stState.status !== 'pending') return;
+
+          const epIndex = task.ep.id - 1;
+          const colPref = colorPrefs[epIndex] || null;
+          const sndPref = soundPrefs[epIndex] || null;
+
+          let colCandidates = colPref ? [colPref] : [1, 2];
+          let sndCandidates = sndPref ? [sndPref] : [1, 2];
+
+          let chosenColorist = null;
+          for (const id of colCandidates) {
+            const worker = colorists[id - 1];
+            if (!worker.currentTask) {
+              chosenColorist = id;
+              break;
+            }
+          }
+
+          let chosenSounder = null;
+          for (const id of sndCandidates) {
+            const worker = sounders[id - 1];
+            if (!worker.currentTask) {
+              chosenSounder = id;
+              break;
+            }
+          }
+
+          if (chosenColorist && chosenSounder) {
+            stState.status = 'inProgress';
+            if (!stState.start) stState.start = cloneDate(date);
+            stState.assignedColoristId = chosenColorist;
+            stState.assignedSoundId = chosenSounder;
+            task.ep.activeStageIndex = task.stIndex;
+
+            colorists[chosenColorist - 1].currentTask = {
+              episodeId: task.ep.id,
+              stageIndex: task.stIndex,
+            };
+            sounders[chosenSounder - 1].currentTask = {
+              episodeId: task.ep.id,
+              stageIndex: task.stIndex,
+            };
+          }
+        });
+
+        // 6) Блюр
+        if (blurCapacity > 0 && readyBlur.length > 0) {
+          const task = readyBlur[0];
+          const stState = task.state;
+          stState.status = 'inProgress';
+          if (!stState.start) stState.start = cloneDate(date);
+          task.ep.activeStageIndex = task.stIndex;
+          blurCapacity = 0;
+        }
+
+        // 7) Продвигаем активные этапы
+        const finishedStages = [];
+        episodes.forEach((ep) => {
+          if (ep.activeStageIndex === null) return;
+          const stState = ep.stages[ep.activeStageIndex];
+          const def = stState.def;
+
+          if (isWorkingDayFor(def.workingType, date)) {
+            if (def.role === 'editor' && stState.assignedEditor === 1 && postSupWorkedToday) {
+              // Кирилл занят как шеф поста (отправка)
+            } else {
+              stState.remaining--;
+            }
+          }
+
+          if (stState.remaining <= 0) {
+            finishedStages.push({ ep, stIndex: ep.activeStageIndex, state: stState });
+          }
+        });
+
+        // 8) Завершаем этапы
+        finishedStages.forEach((item) => {
+          const { ep, stIndex, state } = item;
+          state.status = 'done';
+          state.end = cloneDate(date);
+
+          if (state.def.key === 'sound_color') {
+            if (state.assignedColoristId) {
+              blocks.push({
+                episodeId: ep.id,
+                stageKey: 'color',
+                label: 'Цвет',
+                role: 'colorist',
+                start: cloneDate(state.start),
+                end: cloneDate(state.end),
+                editorId: state.assignedColoristId,
+              });
+              const w = colorists[state.assignedColoristId - 1];
+              if (w) w.currentTask = null;
+            }
+            if (state.assignedSoundId) {
+              blocks.push({
+                episodeId: ep.id,
+                stageKey: 'sound',
+                label: 'Звук',
+                role: 'sound',
+                start: cloneDate(state.start),
+                end: cloneDate(state.end),
+                editorId: state.assignedSoundId,
+              });
+              const w = sounders[state.assignedSoundId - 1];
+              if (w) w.currentTask = null;
+            }
+          } else {
+            blocks.push({
+              episodeId: ep.id,
+              stageKey: state.def.key,
+              label: state.def.name,
+              role: state.def.role,
+              start: cloneDate(state.start),
+              end: cloneDate(state.end),
+              editorId: state.assignedEditor,
+            });
+
+            if (state.def.role === 'editor' || state.def.role === 'post_sup') {
+              if (state.assignedEditor != null) {
+                const editor = editors.find((e) => e.id === state.assignedEditor);
+                if (editor) editor.currentTask = null;
+              }
+            }
+          }
+
+          ep.activeStageIndex = null;
+          ep.currentStageIndex = stIndex + 1;
+
+          if (ep.currentStageIndex < STAGES.length) {
+            const nextState = ep.stages[ep.currentStageIndex];
+            let candidate = addDays(date, 1);
+
+            if (nextState.def.key === 'watch_vlad' && watchOverrides[ep.id - 1]) {
+              const override = cloneDate(watchOverrides[ep.id - 1]);
+              if (override > candidate) candidate = override;
+            }
+
+            nextState.readyDate = candidate;
+          }
+        });
+
+        const allDone = episodes.every(
+          (ep) => ep.currentStageIndex >= STAGES.length && ep.activeStageIndex === null
+        );
+        if (allDone) break;
+
+        date = addDays(date, 1);
+      }
+
+      let actualEndDate = projectStartDate;
+      blocks.forEach((b) => {
+        if (b.end > actualEndDate) actualEndDate = b.end;
+      });
+
+      return { blocks, actualEndDate, editors, colorists, sounders };
+    }
+
+    // ===== ПОСТРОЕНИЕ ТАБЛИЦЫ =====
+    function buildTableWithRoles(
+      episodesCount,
+      startDate,
+      plannedEndDate,
+      kirillEpisodesInput,
+      editorsCountOther,
+      editorNames,
+      coloristNames,
+      soundNames,
+      episodeStartDatesForSim,
+      episodeWatchDatesForSim,
+      episodeTitles,
+      episodeAssignments,
+      episodeColorAssignments,
+      episodeSoundAssignments,
+      startAutoFlags,
+      watchAutoFlags
+    ) {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '';
+
+      const titles = episodeTitles || defaultEpisodeTitles(episodesCount);
+      lastEpisodeTitles = titles;
+      const assignments = episodeAssignments || [];
+      const colorAssignments = episodeColorAssignments || [];
+      const soundAssignments = episodeSoundAssignments || [];
+      lastEpisodeEditorAssignments = assignments;
+      lastEpisodeColorAssignments = colorAssignments;
+      lastEpisodeSoundAssignments = soundAssignments;
+
+      const startAutoEff = startAutoFlags && startAutoFlags.length === episodesCount
+        ? startAutoFlags
+        : new Array(episodesCount).fill(true);
+      const watchAutoEff = watchAutoFlags && watchAutoFlags.length === episodesCount
+        ? watchAutoFlags
+        : new Array(episodesCount).fill(true);
+
+      lastEpisodeStartAutoFlags = startAutoEff;
+      lastEpisodeWatchAutoFlags = watchAutoEff;
+
+      const editorDaysPerEpisode =
+        DAYS_EDIT_NO_RADIOS +
+        DAYS_WATCH_WITH_VLAD +
+        DAYS_VLAD_FIXES_AND_RADIOS +
+        DAYS_EDITOR_FIX_AFTER_QC +
+        DAYS_FINAL_MASTER;
+
+      const ownerIds = computeOwnerIds(
+        episodesCount,
+        kirillEpisodesInput,
+        editorsCountOther,
+        assignments
+      );
+
+      const kirillEpisodesReal = ownerIds.filter(id => id === 1).length;
+      const nonKirillEpisodes = episodesCount - kirillEpisodesReal;
+
+      const totalEditorDaysAll = editorDaysPerEpisode * episodesCount;
+      const totalEditorDaysNonKirill = editorDaysPerEpisode * nonKirillEpisodes;
+      const availableEditorDays = countEditorWorkingDaysInRange(startDate, plannedEndDate);
+      const roughEditorsOther = nonKirillEpisodes === 0
+        ? 0
+        : Math.max(1, Math.ceil(totalEditorDaysNonKirill / availableEditorDays));
+
+      const sim = simulateSchedule(
+        episodesCount,
+        startDate,
+        editorsCountOther,
+        ownerIds,
+        episodeStartDatesForSim,
+        editorNames,
+        episodeWatchDatesForSim,
+        coloristNames,
+        soundNames,
+        colorAssignments,
+        soundAssignments
+      );
+      const { blocks, actualEndDate, editors, colorists, sounders } = sim;
+
+      renderStatsSection(editors, colorists, sounders, ownerIds, blocks);
+
+      const calendarEnd = actualEndDate > plannedEndDate ? actualEndDate : plannedEndDate;
+      const dates = buildDateRange(startDate, calendarEnd);
+
+      const overrunDays =
+        actualEndDate > plannedEndDate
+          ? Math.round((actualEndDate - plannedEndDate) / (1000 * 60 * 60 * 24))
+          : 0;
+
+      const kirillClamp = Math.max(0, Math.min(kirillEpisodesInput || 0, episodesCount));
+
+      const editorsRec = recommendEditorsBySimulation(
+        episodesCount,
+        startDate,
+        plannedEndDate,
+        kirillClamp,
+        editorNames,
+        episodeStartDatesForSim,
+        episodeWatchDatesForSim,
+        coloristNames,
+        soundNames,
+        colorAssignments,
+        soundAssignments
+      );
+      const recommendedEditorsOther = editorsRec.bestN;
+      const maxChecked = editorsRec.maxChecked;
+
+      const kirillRec = recommendKirillEpisodesBySimulation(
+        episodesCount,
+        startDate,
+        plannedEndDate,
+        editorsCountOther,
+        editorNames,
+        episodeStartDatesForSim,
+        episodeWatchDatesForSim,
+        coloristNames,
+        soundNames,
+        colorAssignments,
+        soundAssignments,
+        assignments
+      );
+      const recommendedKirillMax = kirillRec.bestK;
+
+      const summary = document.createElement('div');
+      summary.className = 'summary';
+      summary.textContent =
+        `Оценка: при ${episodesCount} сериях (из них ${kirillEpisodesReal} монтирует Кирилл) ` +
+        `и сроках ${formatDate(startDate)}–${formatDate(plannedEndDate)} ` +
+        `теоретически нужно около ${totalEditorDaysAll} монтажёрских дней. ` +
+        `Фактическое окончание работ по симуляции: ${formatDate(actualEndDate)}.`;
+      resultDiv.appendChild(summary);
+
+      const recommended = document.createElement('div');
+      recommended.className = 'recommended';
+
+      if (recommendedEditorsOther !== null) {
+        recommended.textContent =
+          `Рекомендация по симуляции: чтобы уложиться в дедлайн, ` +
+          `нужно как минимум ${recommendedEditorsOther} монтажёра(ов) (кроме Кирилла). ` +
+          `Вы ввели: ${editorsCountOther}.` +
+          (editorsCountOther < recommendedEditorsOther
+            ? ` Сейчас при ${editorsCountOther} монтажёрах мы выбиваемся из сроков.`
+            : ` При текущем числе монтажёров по симуляции можно уложиться, если не менять другие ограничения.`) +
+          ` (Грубая оценка по дням давала бы ~${roughEditorsOther} монтажёра(ов), ` +
+          `но здесь учтены Влад, блюр, цвет/звук и шеф поста.)`;
+
+        if (recommendedKirillMax > 0) {
+          recommended.textContent +=
+            ` При таком составе команды Кирилл как монтажёр может безопасно взять ` +
+            `до ${recommendedKirillMax} серий (включительно), при этом успевая выполнять ` +
+            `обязанности шефа поста и не выходя за дедлайн. Вы указали: ${kirillEpisodesInput}.`;
+        } else {
+          recommended.textContent +=
+            ` При текущей конфигурации по симуляции Кириллу лучше не брать серии в монтаж, ` +
+            `чтобы полностью сфокусироваться на задачах шефа поста и уложиться в сроки.`;
+        }
+      } else {
+        recommended.textContent =
+          `По симуляции даже при ${maxChecked} монтажёрах (кроме Кирилла) ` +
+          `не удаётся уложиться в заданный срок — ограничение есть в других ролях ` +
+          `(Влад, блюр, цвет/звук, шеф поста и т.д.). ` +
+          `Текущая конфигурация даёт окончание: ${formatDate(actualEndDate)}.` +
+          (recommendedKirillMax > 0
+            ? ` Максимальное число серий, которое Кирилл может взять как монтажёр ` +
+              `при этих условиях и всё ещё не ухудшать ситуацию по дедлайну — ${recommendedKirillMax}.`
+            : ` При этом по симуляции Кириллу как монтажёру лучше не брать серии, ` +
+              `так как его работа шефа поста становится узким местом по срокам.`);
+      }
+
+      resultDiv.appendChild(recommended);
+
+      const status = document.createElement('div');
+      const badge = document.createElement('span');
+      badge.className = 'status-badge ' + (overrunDays > 0 ? 'status-late' : 'status-ontrack');
+      badge.textContent = overrunDays > 0 ? `LATE · +${overrunDays} дн.` : 'ON TRACK';
+      status.appendChild(badge);
+      resultDiv.appendChild(status);
+
+      // Сетка (несколько блоков в день для шефа и QC)
+      const scheduleMap = new Map();
+      function putBlock(rowKey, block) {
+        let row = scheduleMap.get(rowKey);
+        if (!row) {
+          row = new Map();
+          scheduleMap.set(rowKey, row);
+        }
+        let d = cloneDate(block.start);
+        while (d <= block.end) {
+          const key = toISODateKey(d);
+          let arr = row.get(key);
+          if (!arr) {
+            arr = [];
+            row.set(key, arr);
+          }
+          arr.push(block);
+          d = addDays(d, 1);
+        }
+      }
+
+      blocks.forEach(block => {
+        if (block.role === 'editor') {
+          if (!block.editorId) return;
+          putBlock(`editor-${block.editorId}`, block);
+        } else if (block.role === 'qc') {
+          putBlock('qc', block);
+        } else if (block.role === 'blur') {
+          putBlock('blur', block);
+        } else if (block.role === 'post_sup') {
+          putBlock('post_sup', block);
+        } else if (block.role === 'colorist') {
+          if (!block.editorId) return;
+          putBlock(`colorist-${block.editorId}`, block);
+        } else if (block.role === 'sound') {
+          if (!block.editorId) return;
+          putBlock(`sound-${block.editorId}`, block);
+        }
+      });
+
+      const rowDefs = [];
+      editors.forEach(ed => {
+        rowDefs.push({ key: `editor-${ed.id}`, label: ed.name });
+      });
+      colorists.forEach(c => {
+        rowDefs.push({ key: `colorist-${c.id}`, label: c.name });
+      });
+      sounders.forEach(s => {
+        rowDefs.push({ key: `sound-${s.id}`, label: s.name });
+      });
+      rowDefs.push({ key: 'qc',       label: 'Проверка канала' });
+      rowDefs.push({ key: 'blur',     label: 'Блюр' });
+      rowDefs.push({ key: 'post_sup', label: 'Шеф поста' });
+
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      const cornerTh = document.createElement('th');
+      cornerTh.textContent = 'Роль / Дата';
+      cornerTh.className = 'corner-cell';
+      headerRow.appendChild(cornerTh);
+
+      dates.forEach(date => {
+        const th = document.createElement('th');
+        th.className = 'date-header';
+        th.textContent = formatDate(date);
+        if (isSunday(date)) th.classList.add('sunday-header');
+        if (isHoliday(date)) th.classList.add('holiday-header');
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement('tbody');
+
+      rowDefs.forEach(rowDef => {
+        const tr = document.createElement('tr');
+        const labelTd = document.createElement('td');
+        labelTd.className = 'row-label';
+        labelTd.textContent = rowDef.label;
+        tr.appendChild(labelTd);
+
+        const rowMap = scheduleMap.get(rowDef.key);
+
+        dates.forEach(currentDate => {
+          const td = document.createElement('td');
+          if (isSunday(currentDate)) td.classList.add('sunday');
+          if (isHoliday(currentDate)) td.classList.add('holiday');
+
+          if (rowMap) {
+            const key = toISODateKey(currentDate);
+            const arr = rowMap.get(key);
+            if (arr && arr.length > 0) {
+              if ((rowDef.key === 'post_sup' || rowDef.key === 'qc') && arr.length > 1) {
+                td.style.padding = '0';
+                const container = document.createElement('div');
+                container.style.display = 'flex';
+                container.style.flexDirection = 'column';
+                container.style.height = '100%';
+
+                arr.forEach((block, idx) => {
+                  const part = document.createElement('div');
+                  part.style.flex = '1';
+                  part.style.background = colorForEpisode(block.episodeId);
+                  if (idx > 0) {
+                    part.style.borderTop = '1px solid rgba(0,0,0,0.05)';
+                  }
+                  part.style.fontSize = '9px';
+                  part.style.textAlign = 'left';
+                  part.style.padding = '1px 2px';
+                  part.style.overflow = 'hidden';
+
+                  if (sameDay(currentDate, block.start)) {
+                    const labelTitle = titles[block.episodeId - 1] || `Серия ${block.episodeId}`;
+                    part.textContent = `${labelTitle}: ${block.label}`;
+                  } else {
+                    part.textContent = '';
+                  }
+
+                  container.appendChild(part);
+                });
+
+                td.appendChild(container);
+              } else {
+                const block = arr[0];
+                td.style.background = colorForEpisode(block.episodeId);
+                td.style.fontSize = '9px';
+                td.style.textAlign = 'left';
+                td.style.padding = '1px 2px';
+                td.style.overflow = 'hidden';
+
+                if (sameDay(currentDate, block.start)) {
+                  const labelTitle = titles[block.episodeId - 1] || `Серия ${block.episodeId}`;
+                  td.textContent = `${labelTitle}: ${block.label}`;
+                } else {
+                  td.textContent = '';
+                }
+              }
+            }
+          }
+
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'table-wrapper';
+      wrapper.appendChild(table);
+      resultDiv.appendChild(wrapper);
+
+      const legend = document.createElement('div');
+      legend.className = 'legend';
+      for (let ep = 1; ep <= episodesCount; ep++) {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        const colorBox = document.createElement('div');
+        colorBox.className = 'legend-color';
+        colorBox.style.background = colorForEpisode(ep);
+        const text = document.createElement('span');
+        text.textContent = titles[ep - 1] || `Серия ${ep}`;
+        item.appendChild(colorBox);
+        item.appendChild(text);
+        legend.appendChild(item);
+      }
+      resultDiv.appendChild(legend);
+
+      const episodeStartDatesActual = [];
+      const episodeWatchDatesActual = [];
+
+      for (let ep = 1; ep <= episodesCount; ep++) {
+        const bStart = blocks.find(
+          bl => bl.episodeId === ep && bl.stageKey === 'edit_no_radios'
+        );
+        episodeStartDatesActual.push(bStart ? bStart.start : startDate);
+
+        const bWatch = blocks.find(
+          bl => bl.episodeId === ep && bl.stageKey === 'watch_vlad'
+        );
+        episodeWatchDatesActual.push(bWatch ? bWatch.start : startDate);
+      }
+
+      const episodeStartManual = [];
+      const episodeWatchManual = [];
+      for (let i = 0; i < episodesCount; i++) {
+        episodeStartManual[i] =
+          !startAutoEff[i] && episodeStartDatesForSim && episodeStartDatesForSim[i]
+            ? cloneDate(episodeStartDatesForSim[i])
+            : null;
+        episodeWatchManual[i] =
+          !watchAutoEff[i] && episodeWatchDatesForSim && episodeWatchDatesForSim[i]
+            ? cloneDate(episodeWatchDatesForSim[i])
+            : null;
+      }
+
+      const episodesParent = document.getElementById('episodesCard') || resultDiv;
+
+      renderEpisodesMetaBlock(
+        episodesParent,
+        episodesCount,
+        titles,
+        episodeStartDatesActual,
+        episodeWatchDatesActual,
+        startDate,
+        plannedEndDate,
+        editors,
+        assignments,
+        coloristNames,
+        soundNames,
+        colorAssignments,
+        soundAssignments,
+        startAutoEff,
+        watchAutoEff,
+        episodeStartManual,
+        episodeWatchManual
+      );
+
+      window.lastScheduleData = {
+        blocks,
+        editors,
+        colorists,
+        sounders,
+        startDate,
+        calendarEnd,
+        episodesCount,
+        kirillEpisodesInput,
+        editorsCountOther
+      };
+
+      const state = {
+        episodesCount,
+        startDate: dateToInputValue(startDate),
+        endDate: dateToInputValue(plannedEndDate),
+        holidayStart: holidayStartGlobal ? dateToInputValue(holidayStartGlobal) : null,
+        holidayEnd:   holidayEndGlobal   ? dateToInputValue(holidayEndGlobal)   : null,
+        kirillEpisodesInput,
+        editorsCountOther,
+        editorNames,
+        coloristNames,
+        soundNames,
+        episodeTitles: titles,
+        episodeEditorAssignments: assignments,
+        episodeColorAssignments: colorAssignments,
+        episodeSoundAssignments: soundAssignments,
+        episodeStartAutoFlags: startAutoEff,
+        episodeWatchAutoFlags: watchAutoEff,
+        episodeStartManualDates: episodeStartManual.map(d => d ? dateToInputValue(d) : null),
+        episodeWatchManualDates: episodeWatchManual.map(d => d ? dateToInputValue(d) : null)
+      };
+      saveState(state);
+    }
+
+    // ===== ЭКСПОРТ В EXCEL =====
+    function exportToExcelGrid() {
+      const data = window.lastScheduleData;
+      if (!data) {
+        alert('Сначала постройте график.');
+        return;
+      }
+
+      const { blocks, editors, colorists, sounders, startDate, calendarEnd } = data;
+      const dates = buildDateRange(startDate, calendarEnd);
+
+      const scheduleMap = new Map();
+      function putBlock(rowKey, block) {
+        let row = scheduleMap.get(rowKey);
+        if (!row) {
+          row = new Map();
+          scheduleMap.set(rowKey, row);
+        }
+        let d = cloneDate(block.start);
+        while (d <= block.end) {
+          const key = toISODateKey(d);
+          let arr = row.get(key);
+          if (!arr) {
+            arr = [];
+            row.set(key, arr);
+          }
+          arr.push(block);
+          d = addDays(d, 1);
+        }
+      }
+
+      blocks.forEach(block => {
+        if (block.role === 'editor') {
+          if (!block.editorId) return;
+          putBlock(`editor-${block.editorId}`, block);
+        } else if (block.role === 'qc') {
+          putBlock('qc', block);
+        } else if (block.role === 'blur') {
+          putBlock('blur', block);
+        } else if (block.role === 'post_sup') {
+          putBlock('post_sup', block);
+        } else if (block.role === 'colorist') {
+          if (!block.editorId) return;
+          putBlock(`colorist-${block.editorId}`, block);
+        } else if (block.role === 'sound') {
+          if (!block.editorId) return;
+          putBlock(`sound-${block.editorId}`, block);
+        }
+      });
+
+      const rowDefs = [];
+      editors.forEach(ed => {
+        rowDefs.push({ key: `editor-${ed.id}`, label: ed.name });
+      });
+      colorists.forEach(c => {
+        rowDefs.push({ key: `colorist-${c.id}`, label: c.name });
+      });
+      sounders.forEach(s => {
+        rowDefs.push({ key: `sound-${s.id}`, label: s.name });
+      });
+      rowDefs.push({ key: 'qc',       label: 'Проверка канала' });
+      rowDefs.push({ key: 'blur',     label: 'Блюр' });
+      rowDefs.push({ key: 'post_sup', label: 'Шеф поста' });
+
+      let html = '<html><head><meta charset="UTF-8"></head><body><table border="1">';
+      html += '<tr><th>Роль / Дата</th>';
+      dates.forEach(d => { html += `<th>${formatDate(d)}</th>`; });
+      html += '</tr>';
+
+      rowDefs.forEach(rowDef => {
+        html += `<tr><td>${rowDef.label}</td>`;
+        const rowMap = scheduleMap.get(rowDef.key);
+
+        dates.forEach(currentDate => {
+          let style = '';
+          let text = '';
+          if (isSunday(currentDate)) style += 'background-color:#f0f0f0;';
+          if (isHoliday(currentDate)) style += 'background-color:#e0faff;';
+
+          if (rowMap) {
+            const key = toISODateKey(currentDate);
+            const arr = rowMap.get(key);
+            if (arr && arr.length > 0) {
+              const first = arr[0];
+              style += `background-color:${excelColorForEpisode(first.episodeId)};`;
+              const startsToday = arr
+                .filter(b => sameDay(currentDate, b.start))
+                .map(b => `S${b.episodeId}: ${b.label}`);
+              if (startsToday.length > 0) {
+                text = startsToday.join(' / ');
+              }
+            }
+          }
+
+          html += `<td style="${style}">${text}</td>`;
+        });
+
+        html += '</tr>';
+      });
+
+      html += '</table></body></html>';
+
+      const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'schedule.xls';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ===== СКАЧАТЬ / ЗАГРУЗИТЬ ПРОЕКТ =====
+    function downloadProject() {
+      const saved = loadState();
+      if (!saved) {
+        alert('Нет сохранённого проекта. Сначала постройте график.');
+        return;
+      }
+      const json = JSON.stringify(saved, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const now = new Date();
+      const stamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}-${String(now.getMinutes()).padStart(2,'0')}`;
+      a.download = `post_schedule_${stamp}.json`;
+      a.href = url;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function uploadProject() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json,.json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result);
+            if (!data || !data.episodesCount || !data.startDate || !data.endDate) {
+              alert('Файл не похож на сохранённый проект.');
+              return;
+            }
+            saveState(data);
+            location.reload();
+          } catch (err) {
+            alert('Не удалось прочитать файл проекта: ' + err.message);
+          }
+        };
+        reader.readAsText(file, 'utf-8');
+      };
+      input.click();
+    }
+
+    // ===== ИНИЦИАЛИЗАЦИЯ =====
+    document.getElementById('buildBtn').addEventListener('click', () => {
+      const episodesCount = parseInt(document.getElementById('episodes').value, 10);
+      const startDate = parseDate(document.getElementById('startDate').value);
+      const endDate = parseDate(document.getElementById('endDate').value);
+      const holidayStart = parseDate(document.getElementById('holidayStart').value);
+      const holidayEnd = parseDate(document.getElementById('holidayEnd').value);
+      let kirillEpisodes = parseInt(document.getElementById('kirillEpisodes').value, 10) || 0;
+      let editorsCountOther = parseInt(document.getElementById('editorsCount').value, 10) || 0;
+
+      if (!episodesCount || episodesCount <= 0) {
+        alert('Введите корректное количество серий (минимум 1).');
+        return;
+      }
+      if (!startDate || !endDate) {
+        alert('Введите дату начала и окончания проекта.');
+        return;
+      }
+      if (endDate < startDate) {
+        alert('Дата окончания раньше даты начала.');
+        return;
+      }
+      if (kirillEpisodes < 0) kirillEpisodes = 0;
+      if (kirillEpisodes > episodesCount) {
+        alert('Кирилл не может монтировать больше серий, чем всего есть.');
+        return;
+      }
+
+      const nonKirillEpisodes = episodesCount - kirillEpisodes;
+      if (nonKirillEpisodes > 0 && editorsCountOther < 1) {
+        alert('Есть серии не для Кирилла — нужен минимум 1 монтажёр.');
+        return;
+      }
+
+      if (holidayStart && holidayEnd) {
+        if (holidayEnd < holidayStart) {
+          holidayStartGlobal = holidayEnd;
+          holidayEndGlobal = holidayStart;
+        } else {
+          holidayStartGlobal = holidayStart;
+          holidayEndGlobal = holidayEnd;
+        }
+      } else {
+        holidayStartGlobal = null;
+        holidayEndGlobal = null;
+      }
+
+      const existingAssignments = lastEpisodeEditorAssignments || Array(episodesCount).fill(null);
+      const existingColorAssignments = lastEpisodeColorAssignments || Array(episodesCount).fill(null);
+      const existingSoundAssignments = lastEpisodeSoundAssignments || Array(episodesCount).fill(null);
+      const existingTitles =
+        lastEpisodeTitles || defaultEpisodeTitles(episodesCount);
+
+      renderEditorNamesSection(
+        kirillEpisodes,
+        editorsCountOther,
+        lastEditorNames,
+        lastColoristNames,
+        lastSoundNames
+      );
+      const { editorNames, coloristNames, soundNames } =
+        getNamesFromInputs(kirillEpisodes, editorsCountOther);
+
+      lastEditorNames = editorNames;
+      lastColoristNames = coloristNames;
+      lastSoundNames = soundNames;
+
+      const episodeStartForSim = null;
+      const episodeWatchForSim = null;
+      const startAutoFlags = null;
+      const watchAutoFlags = null;
+
+      buildTableWithRoles(
+        episodesCount,
+        startDate,
+        endDate,
+        kirillEpisodes,
+        editorsCountOther,
+        editorNames,
+        coloristNames,
+        soundNames,
+        episodeStartForSim,
+        episodeWatchForSim,
+        existingTitles,
+        existingAssignments,
+        existingColorAssignments,
+        existingSoundAssignments,
+        startAutoFlags,
+        watchAutoFlags
+      );
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', exportToExcelGrid);
+    document.getElementById('downloadProjectBtn').addEventListener('click', downloadProject);
+    document.getElementById('uploadProjectBtn').addEventListener('click', uploadProject);
+
+    document.getElementById('resetStateBtn').addEventListener('click', () => {
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    });
+
+    // Кнопка fullscreen
+    (function initFullscreenToggle() {
+      const btn = document.getElementById('fullscreenToggleBtn');
+      const card = document.getElementById('resultCard');
+      if (!btn || !card) return;
+
+      btn.addEventListener('click', () => {
+        const isFull = card.classList.toggle('fullscreen');
+        if (isFull) {
+          document.body.classList.add('fullscreen-active');
+          btn.textContent = 'Свернуть';
+        } else {
+          document.body.classList.remove('fullscreen-active');
+          btn.textContent = 'На весь экран';
+        }
+      });
+    })();
+
+    // Авто-инициализация при загрузке
+    (function initPage() {
+      const saved = loadState();
+      const episodesInput = document.getElementById('episodes');
+      const startInput = document.getElementById('startDate');
+      const endInput = document.getElementById('endDate');
+      const holidayStartInput = document.getElementById('holidayStart');
+      const holidayEndInput = document.getElementById('holidayEnd');
+      const kirillInput = document.getElementById('kirillEpisodes');
+      const editorsInput = document.getElementById('editorsCount');
+
+      if (saved && saved.episodesCount) {
+        episodesInput.value = saved.episodesCount;
+        startInput.value = saved.startDate;
+        endInput.value = saved.endDate;
+        kirillInput.value = saved.kirillEpisodesInput;
+        editorsInput.value = saved.editorsCountOther;
+
+        if (saved.holidayStart) {
+          holidayStartInput.value = saved.holidayStart;
+          holidayStartGlobal = parseDate(saved.holidayStart);
+        }
+        if (saved.holidayEnd) {
+          holidayEndInput.value = saved.holidayEnd;
+          holidayEndGlobal = parseDate(saved.holidayEnd);
+        }
+
+        const startDate = parseDate(saved.startDate);
+        const endDate = parseDate(saved.endDate);
+        const titles = saved.episodeTitles || defaultEpisodeTitles(saved.episodesCount);
+        const editorNames = saved.editorNames || { kirillName: 'Кирилл', otherNames: [] };
+        const coloristNames = saved.coloristNames || ['Колорист 1', 'Колорист 2'];
+        const soundNames = saved.soundNames || ['Звукорежиссёр 1', 'Звукорежиссёр 2'];
+        const assignments = saved.episodeEditorAssignments || Array(saved.episodesCount).fill(null);
+        const colorAssignments = saved.episodeColorAssignments || Array(saved.episodesCount).fill(null);
+        const soundAssignments = saved.episodeSoundAssignments || Array(saved.episodesCount).fill(null);
+
+        const startAutoFlags = saved.episodeStartAutoFlags || null;
+        const watchAutoFlags = saved.episodeWatchAutoFlags || null;
+
+        const episodeStartManual = (saved.episodeStartManualDates || []).map(d => d ? parseDate(d) : null);
+        const episodeWatchManual = (saved.episodeWatchManualDates || []).map(d => d ? parseDate(d) : null);
+
+        lastEditorNames = editorNames;
+        lastColoristNames = coloristNames;
+        lastSoundNames = soundNames;
+        lastEpisodeTitles = titles;
+        lastEpisodeEditorAssignments = assignments;
+        lastEpisodeColorAssignments = colorAssignments;
+        lastEpisodeSoundAssignments = soundAssignments;
+        lastEpisodeStartAutoFlags = startAutoFlags;
+        lastEpisodeWatchAutoFlags = watchAutoFlags;
+
+        renderEditorNamesSection(
+          saved.kirillEpisodesInput,
+          saved.editorsCountOther,
+          editorNames,
+          coloristNames,
+          soundNames
+        );
+        renderStatsSection(null, null, null, null, null);
+
+        buildTableWithRoles(
+          saved.episodesCount,
+          startDate,
+          endDate,
+          saved.kirillEpisodesInput,
+          saved.editorsCountOther,
+          editorNames,
+          coloristNames,
+          soundNames,
+          episodeStartManual,
+          episodeWatchManual,
+          titles,
+          assignments,
+          colorAssignments,
+          soundAssignments,
+          startAutoFlags,
+          watchAutoFlags
+        );
+      } else {
+        const today = new Date();
+        const in60 = new Date();
+        in60.setDate(in60.getDate() + 60);
+
+        const fmt = d =>
+          `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+            d.getDate()
+          ).padStart(2, '0')}`;
+
+        startInput.value = fmt(today);
+        endInput.value = fmt(in60);
+
+        const kirillEpisodes = parseInt(kirillInput.value, 10) || 0;
+        const editorsCountOther = parseInt(editorsInput.value, 10) || 0;
+        const episodesCount = parseInt(episodesInput.value, 10) || 8;
+
+        renderEditorNamesSection(
+          kirillEpisodes,
+          editorsCountOther,
+          null,
+          null,
+          null
+        );
+        renderStatsSection(null, null, null, null, null);
+
+        lastEpisodeTitles = defaultEpisodeTitles(episodesCount);
+        lastEpisodeEditorAssignments = Array(episodesCount).fill(null);
+        lastEpisodeColorAssignments = Array(episodesCount).fill(null);
+        lastEpisodeSoundAssignments = Array(episodesCount).fill(null);
+      }
+    })();
+  </script>
+</body>
+</html>
